@@ -1,7 +1,5 @@
 package gojek.tech.museumsearch.home;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 
 import gojek.tech.museumsearch.model.MuseumNameResponse;
@@ -39,7 +37,7 @@ public class HomePresenter {
 
             @Override
             public void namaMuseumError(Throwable e) {
-                Log.i("VOEN","ERROR : "+e.toString());
+                homeActivity.displayError(e);
             }
         });
     }

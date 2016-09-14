@@ -1,10 +1,10 @@
 package gojek.tech.museumsearch.home;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,11 +14,17 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import javax.inject.Inject;
+
+import gojek.tech.museumsearch.MuseumApplication;
 import gojek.tech.museumsearch.R;
 import gojek.tech.museumsearch.network.NetworkManager;
+import gojek.tech.museumsearch.profile.ProfileActivity;
+import gojek.tech.museumsearch.util.Constant;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
-    private NetworkManager networkManager;
+    @Inject
+    public NetworkManager networkManager;
     private HomePresenter homePresenter;
     private Button buttonCari;
     private EditText textCari;
@@ -30,16 +36,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        ((MuseumApplication) getApplication()).providesAppComponents().inject(this);
 
-        networkManager = new NetworkManager();
         homePresenter = new HomePresenter(this, networkManager);
         buttonCari = (Button) findViewById(R.id.button_cari);
         textCari = (EditText) findViewById(R.id.text_cari);
@@ -87,8 +85,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getApplicationContext(), ids[i], Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString(Constant.PREFERENCE_MUSEUM_ID, ids[i]);
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
+    }
+
+    public void displayError(Throwable e)
+    {
+        Toast toast = Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 }
